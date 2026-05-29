@@ -13,7 +13,7 @@ MAX_GENES = 2500
 MAX_PCT_MT = 5.0
 
 
-data_path = "../data/raw/hg19/"
+data_path = "../data/raw/"
 adata = sc.read_10x_mtx(data_path, var_names = "gene_symbols", cache = True)
 
 logger.info(f"Before filtering: {adata.n_obs} ")
@@ -32,5 +32,4 @@ logger.info(f"After filtering: {adata_filtered.n_obs} cells")
 logger.info(f"Removed: {adata.n_obs - adata_filtered.n_obs} cells")
 
 
-adata_filtered.write(filename = "../data/filtered/hg_19_qc_filtered.h5ad", compression = "gzip")
-
+adata_filtered.write(filename = "../data/filtered_qc/hg_19_qc_filtered.h5ad", compression = "gzip")
