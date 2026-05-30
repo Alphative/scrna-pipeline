@@ -43,15 +43,16 @@ def save_results(adata, output_path):
     adata.write(filename=output_path, compression="gzip")
     logger.info(f"File successfully saved to {output_path}")
 
-def save_metadata(adata, metadata_path, args):
-    metadata = {"timestamp": datetime.datetime.now().isoformat(),
-                "cells": adata.n_obs, 
-                "clusters": adata.obs['leiden'].nunique(),
-                "parameters": {"n_neighbors": args.n_neighbors,
-                               "n_comps": args.n_comps,
-                               "resolution": args.resolution}}
+def save_metadata(n_cells, n_clusters, metadata_path, parameters):
+    metadata = {
+        "timestamp": datetime.datetime.now().isoformat(),
+        "cells": n_cells,
+        "clusters": n_clusters,
+        "parameters": parameters,
+    }
     with open(metadata_path, "w") as f:
         json.dump(metadata, f, indent=4)
+    logger.info(f"Metadata successfully saved to {metadata_path}")
 
 
 #=========================
@@ -67,6 +68,13 @@ def main():
     parser.add_argument("--n_comps", type=int, default=50)
     parser.add_argument("--resolution", type=float, default=0.5)
     args = parser.parse_args()
+
+    pipeline_params = {
+        "n_neighbors": args.n_neighbors,
+        "n_comps": args.n_comps,
+        "resolution": args.resolution,
+    }
+
     #loading data
     adata = load_data(data_path=args.input_path)
     #PCA
@@ -79,7 +87,12 @@ def main():
     adata = run_umap(adata)
     #saving
     save_results(adata, args.output_path)
-    save_metadata(adata, args.metadata_path, args)
+    save_metadata(
+        n_cells=int(adata.n_obs),
+        n_clusters=int(adata.obs["leiden"].nunique()),
+        metadata_path=args.metadata_path,
+        parameters=pipeline_params
+    )
 
 if __name__ == "__main__":
     main()
