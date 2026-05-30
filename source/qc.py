@@ -1,4 +1,6 @@
+#=========================
 #imports
+#=========================
 import scanpy as sc
 import pandas as pd
 import numpy as np
@@ -7,15 +9,15 @@ import argparse
 import json
 import datetime
 
-
+#=========================
 #logging setup
-
+#=========================
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
+#=========================
 #func
-
+#=========================
 def load_data(data_path):
     """Load 10x MTX matrix from directory."""
     adata = sc.read_10x_mtx(data_path, var_names = "gene_symbols", cache = True)
@@ -62,8 +64,9 @@ def save_metadata(adata_before, adata_after, args, output_path):
     with open(output_path, "w") as f:
         json.dump(metadata, f, indent=4)
 
-
+#=========================
 #MAIN
+#=========================
 def main():
     #agrparse
     parser = argparse.ArgumentParser()
