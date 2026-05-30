@@ -1,0 +1,85 @@
+#=========================
+#imports
+#=========================
+import logging
+import scanpy as sc
+import argparse
+import json
+import datetime
+#=========================
+#logger cfg
+#=========================
+logging.basicConfig(level=logging.INFO)
+logger=logging.getLogger(__name__)
+#=========================
+#func
+#=========================
+def load_data(data_path):
+    adata = sc.read_h5ad(data_path)
+    logger.info(f"Loaded successfully {adata.n_obs} cells")
+    return adata
+
+def run_pca(adata, n_comps=50):
+    sc.tl.pca(adata, n_comps=n_comps)
+    logger.info(f"Successfully Compressed {n_comps}")
+    return adata
+
+def run_neighbors(adata, n_neighbors=15):
+    sc.pp.neighbors(adata, n_neighbors=n_neighbors)
+    logger.info(f"Neighbors found: {n_neighbors}")
+    return adata
+
+def run_clustering(adata, resolution=0.5):
+    sc.tl.leiden(adata, resolution=resolution, flavor="igraph", n_iterations=2, directed=False)
+    logger.info(f"Clusters created: {adata.obs['leiden'].nunique()}")
+    return adata
+
+def run_umap(adata):
+    sc.tl.umap(adata)
+    logger.info(f"UMAP created {adata.obsm['X_umap'].shape}")
+    return adata
+
+def save_results(adata, output_path):
+    adata.write(filename=output_path, compression="gzip")
+    logger.info(f"File successfully saved to {output_path}")
+
+def save_metadata(adata, metadata_path, args):
+    metadata = {"timestamp": datetime.datetime.now().isoformat(),
+                "cells": adata.n_obs, 
+                "clusters": adata.obs['leiden'].nunique(),
+                "parameters": {"n_neighbors": args.n_neighbors,
+                               "n_comps": args.n_comps,
+                               "resolution": args.resolution}}
+    with open(metadata_path, "w") as f:
+        json.dump(metadata, f, indent=4)
+
+
+#=========================
+#main
+#=========================
+def main():
+    #argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input_path", type=str, required = True)
+    parser.add_argument("--output_path", type=str, required = True)
+    parser.add_argument("--metadata_path", type=str, required = True)
+    parser.add_argument("--n_neighbors", type=int, default = 15)
+    parser.add_argument("--n_comps", type=int, default=50)
+    parser.add_argument("--resolution", type=float, default=0.5)
+    args = parser.parse_args()
+    #loading data
+    adata = load_data(data_path=args.input_path)
+    #PCA
+    adata = run_pca(adata, n_comps=args.n_comps)
+    #neighbors
+    adata = run_neighbors(adata, n_neighbors=args.n_neighbors)
+    #clustering
+    adata = run_clustering(adata, resolution=args.resolution)
+    #UMAP
+    adata = run_umap(adata)
+    #saving
+    save_results(adata, args.output_path)
+    save_metadata(adata, args.metadata_path, args)
+
+if __name__ == "__main__":
+    main()
