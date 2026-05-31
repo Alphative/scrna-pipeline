@@ -1,13 +1,16 @@
 #=========================
 #imports
 #=========================
+import os
 import sys
 import anndata
 import pytest
-import scanpy as sc
 import numpy as np
 
-sys.path.append("../source")
+current_dir = os.path.dirname(os.path.abspath(__file__))
+source_path = os.path.abspath(os.path.join(current_dir, "../source"))
+if source_path not in sys.path:
+    sys.path.append(source_path)
 from cluster import run_pca, run_neighbors, run_clustering, run_umap
 
 @pytest.fixture

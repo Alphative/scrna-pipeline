@@ -1,13 +1,17 @@
 #
 #import
 #
+import os
 import sys
 import anndata
 import numpy as np
 import pandas as pd
 import pytest
 
-sys.path.append("../source")
+current_dir = os.path.dirname(os.path.abspath(__file__))
+source_path = os.path.abspath(os.path.join(current_dir, "../source"))
+if source_path not in sys.path:
+    sys.path.append(source_path)
 from qc import compute_qc, filter_cells
 
 @pytest.fixture
