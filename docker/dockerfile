@@ -1,0 +1,12 @@
+FROM continuumio/miniconda3
+
+WORKDIR /scrna_seq
+
+COPY environment.yml .
+
+RUN conda env update -n base -f environment.yml && conda clean --all -y
+
+COPY source/ source/
+COPY tests/ tests/
+
+CMD ["/bin/bash"]
