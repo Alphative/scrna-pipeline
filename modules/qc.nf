@@ -1,5 +1,5 @@
 process QC {
-    publishDir "${params.output_path}", mode: 'copy'
+    publishDir "${params.output_qc}", mode: 'copy'
     input: path data_path
 
     output:

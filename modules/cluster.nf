@@ -1,5 +1,5 @@
 process CLUSTER {
-    publishDir "${params.output_path}", mode: 'copy'
+    publishDir "${params.output_cluster}", mode: 'copy'
     
     input: path normalized_data
 

@@ -1,5 +1,5 @@
     process NORMALIZE {
-        publishDir "${params.output_path}", mode: 'copy'
+        publishDir "${params.output_norm}", mode: 'copy'
         input: path filtered_data
 
         output: 
