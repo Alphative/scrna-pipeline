@@ -9,7 +9,7 @@ process CLUSTER {
 
     script:
     """
-    python cluster.py \
+    python /scrna_seq/source/cluster.py \
     --input_path $normalized_data \
     --output_path clustered.h5ad \
     --metadata_path metadata_clustered.json \

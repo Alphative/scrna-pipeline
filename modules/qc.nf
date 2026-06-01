@@ -1,6 +1,7 @@
 process QC {
     publishDir "${params.output_qc}", mode: 'copy'
-    input: path data_path
+    input: 
+    path "raw/*"
 
     output:
     path "filtered.h5ad"
@@ -8,8 +9,8 @@ process QC {
     
     script:
     """
-    python qc.py \
-    --data_path $data_path \
+    python /scrna_seq/source/qc.py \
+    --data_path raw \
     --output_path filtered.h5ad \
     --metadata_path metadata_qc.json \
     --min_genes ${params.min_genes} \

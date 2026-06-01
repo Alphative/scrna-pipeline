@@ -8,7 +8,7 @@
 
         script:
         """
-        python normalize.py \
+        python /scrna_seq/source/normalize.py \
         --input_path $filtered_data \
         --output_path normalized.h5ad \
         --metadata_path metadata_norm.json \
