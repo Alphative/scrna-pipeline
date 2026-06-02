@@ -1,21 +1,21 @@
-name: Run Tests
+name: Continuous Integration
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
 
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up conda
-      uses: conda-incubator/setup-miniconda@v2
-      with:
-        environment-file: environment.yml
-        activate-environment: scrna
-    
-    - name: Run tests
-      shell: bash -l {0}
-      run: |
-        pytest tests/
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Build Docker Image
+      run: docker build -t scrna-pipeline -f docker/Dockerfile .
+
+    - name: Run Unit Tests inside Container
+      run: docker run scrna-pipeline pytest tests/
