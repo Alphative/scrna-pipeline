@@ -25,6 +25,7 @@ def load_data(data_path):
 
 
 def compute_qc(adata, mt_prefix):
+    """Compute QC metrics: mitochondrial, ribosomal, and MALAT1 gene tracking."""
     adata.var["mt"] = adata.var_names.str.startswith(mt_prefix)
     adata.var["ribo"] = adata.var_names.str.startswith(("RPS", "RPL"))
     adata.var["malat1"] = adata.var_names == "MALAT1"
@@ -39,6 +40,7 @@ def compute_qc(adata, mt_prefix):
 
 
 def filter_genes(adata):
+    """Remove genes not expressed in any cell."""
     logger.info(f"Genes Before: {adata.n_vars}")
     sc.pp.filter_genes(adata, min_cells=1)
     logger.info(f"Genes After:{adata.n_vars}")
@@ -46,6 +48,7 @@ def filter_genes(adata):
 
 
 def filter_cells(adata, cell_qc, min_genes, max_genes, max_pct_mt):
+    """Filter cells by gene count and mitochondrial RNA percentage."""
     mask = (
         (cell_qc["n_genes_by_counts"] > min_genes)
         & (cell_qc["n_genes_by_counts"] < max_genes)
@@ -58,11 +61,13 @@ def filter_cells(adata, cell_qc, min_genes, max_genes, max_pct_mt):
 
 
 def save_results(adata_filtered, output_path):
+    """Save filtered AnnData object to h5ad file."""
     adata_filtered.write(filename=output_path, compression="gzip")
     logger.info(f"File successfully saved to {output_path}")
 
 
 def save_metadata(input_cells, output_cells, output_path, parameters):
+    """Save pipeline run metadata and parameters to JSON file."""
     metadata = {
         "timestamp": datetime.datetime.now().isoformat(),
         "input_cells": input_cells,

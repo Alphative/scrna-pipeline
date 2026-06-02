@@ -15,22 +15,26 @@ logger=logging.getLogger(__name__)
 #func
 #=========================
 def load_data(data_path):
+    """Load filtered AnnData object from h5ad file"""
     adata = sc.read_h5ad(data_path)
     logger.info(f"Loaded successfully {adata.n_obs} cells")
     return adata
 
 def normalize(adata, target_sum=1e4):
+    """Normalize counts per cell to target_sum and apply log1p transformation"""
     sc.pp.normalize_total(adata, target_sum=target_sum)
     sc.pp.log1p(adata)
     logger.info(f"Normalized {adata.n_obs} cells successfully")
     return adata
 
 def save_results(adata, output_path):
+    """Save normalized AnnData object to h5ad file."""
     adata.write(filename=output_path, compression="gzip")
     logger.info(f"File successfully saved to {output_path}")
 
 
 def save_metadata(adata, metadata_path, target_sum):
+    """Save normalization metadata and parameters to JSON file."""
     metadata = {"timestamp": datetime.datetime.now().isoformat(),
                 "cells": adata.n_obs, 
                 "parameters": {"target_sum": target_sum}}

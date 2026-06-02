@@ -15,35 +15,42 @@ logger=logging.getLogger(__name__)
 #func
 #=========================
 def load_data(data_path):
+    """Load normalized AnnData object from h5ad file."""
     adata = sc.read_h5ad(data_path)
     logger.info(f"Loaded successfully {adata.n_obs} cells")
     return adata
 
 def run_pca(adata, n_comps=50):
+    """Reduce dimensionality using PCA."""
     sc.tl.pca(adata, n_comps=n_comps)
     logger.info(f"Successfully Compressed {n_comps}")
     return adata
 
 def run_neighbors(adata, n_neighbors=15):
+    """Build k-nearest neighbor graph for clustering and UMAP."""
     sc.pp.neighbors(adata, n_neighbors=n_neighbors)
     logger.info(f"Neighbors found: {n_neighbors}")
     return adata
 
 def run_clustering(adata, resolution=0.5):
+    """Cluster cells using Leiden algorithm."""
     sc.tl.leiden(adata, resolution=resolution, flavor="igraph", n_iterations=2, directed=False)
     logger.info(f"Clusters created: {adata.obs['leiden'].nunique()}")
     return adata
 
 def run_umap(adata):
+    """Compute UMAP embedding for visualization."""
     sc.tl.umap(adata)
     logger.info(f"UMAP created {adata.obsm['X_umap'].shape}")
     return adata
 
 def save_results(adata, output_path):
+    """Save clustered AnnData object to h5ad file."""
     adata.write(filename=output_path, compression="gzip")
     logger.info(f"File successfully saved to {output_path}")
 
 def save_metadata(n_cells, n_clusters, metadata_path, parameters):
+    """Save clustering metadata and parameters to JSON file."""
     metadata = {
         "timestamp": datetime.datetime.now().isoformat(),
         "cells": n_cells,
